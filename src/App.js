@@ -2,7 +2,7 @@ import React from 'react'
 import Form from "./Form"
 
 const apiKey = "b2dc6d0fb2c25c99d7b90a281b8cedd3"
-
+// api.openweathermap.org/data/2.5/weather?q=Seoul&appid=b2dc6d0fb2c25c99d7b90a281b8cedd3
 // handleSubmit(){
 //   return (
 //     <form onSubmit={this.}>
@@ -21,7 +21,11 @@ class WeatherApp extends React.Component{
       isLoaded: false,
       items: [],
       state: "",
-      city: ""
+      city: "Placeholder",
+      maxTemp: "test",
+      minTemp: "test",
+      temp: "test",
+      humidity: "test"
     }
   }
 
@@ -31,10 +35,26 @@ class WeatherApp extends React.Component{
     })
   }
 
+  
   getWeather = (event) => {
+    let obj;
     event.preventDefault(); //this stops from the page from reloading everytime you submit the search
-    alert(this.state.city + ", " + this.state.state)
+    
+    
+    let response = fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
+      .then(response => response.json())
+      .then(data => obj = data)
+      .then(() => 
+      this.setState({
+        maxTemp : obj.main.temp_max,
+        minTemp: obj.main.temp_min,
+        temp: obj.main.temp,
+        humidity : obj.main.humidity
+      }, console.log(obj.main)))
+      .then(console.log(this.state.maxTemp))
+     // .then(() => console.log(this.state.maxTemp))
   }
+//temp, temp_max, temp_min, humidity
 
   componentDidMount(){
   }
@@ -52,66 +72,15 @@ class WeatherApp extends React.Component{
                     <input type="text" placeholder="State" name="state" onChange={this.handleInputChanged}/>
                    <button onClick={this.getWeather}>Search</button>
                    <p>{this.state.city} {this.state.state}</p>
+                   <p>The Max: {this.state.maxTemp}</p>
+                   <p>The Min: {this.state.minTemp}</p>
+                   <p>Temp: {this.state.maxTemp}</p>
+                   <p>Humidity: {this.state.maxTemp}</p>
                 </form>
             </div>
         </div>
     )
   }
 }
-
-
-// class WeatherApp extends React.Component {
-//     constructor(props){
-//       super(props)
-//       this.state={
-//         error: null,
-//         isLoaded: false,
-//         items: []
-//       };
-//     }
-    
-//     componentDidMount(){
-//       fetch('api.openweathermap.org/data/2.5/weather?q={city name},{state code}&appid={API key}')
-//       .then(res => res.json()) //I think this formats the file into json?
-//       .then(
-//         (result) => {
-//           this.setState({
-//             isLoaded : true,
-//             items: result.items
-//           });
-//         },
-
-//         (error) => {
-//           this.setState({
-//             isLoaded: true,
-//             error
-//           });
-//         }
-          
-//       )
-//     }
-
-//     render(){
-//       const {error, isLoaded, items} = this.state;
-//       if(error){
-//         return <div>
-//           Error: {error.message}
-//         </div>
-//       } else if (!isLoaded) {
-//         return <div>Loading...</div>
-//       } else {
-//         return (
-//           <ul>
-//             {items.map(item => (
-//               <li key={item.id}>
-//                 {item.name} {item.price}
-//               </li>
-//             ))}
-//           </ul>
-//         )
-//       }
-//     }
-
-// }
 
 export default WeatherApp;
