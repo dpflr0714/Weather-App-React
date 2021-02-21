@@ -1,5 +1,8 @@
 import React from 'react'
 import Form from "./Form"
+import Button from '@material-ui/core/Button'
+import CloudIcon from '@material-ui/icons/Cloud'
+import TextField from '@material-ui/core/TextField'
 
 const apiKey = "b2dc6d0fb2c25c99d7b90a281b8cedd3"
 // api.openweathermap.org/data/2.5/weather?q=Seoul&appid=b2dc6d0fb2c25c99d7b90a281b8cedd3
@@ -20,12 +23,15 @@ class WeatherApp extends React.Component{
       error: null,
       isLoaded: false,
       items: [],
-      state: "",
-      city: "Placeholder",
+      state: "State",
+      city: "City",
       maxTemp: "test",
       minTemp: "test",
       temp: "test",
-      humidity: "test"
+      humidity: "test",
+      condition : "",
+      icon : "",
+      imageSrc : ""
     }
   }
 
@@ -49,12 +55,12 @@ class WeatherApp extends React.Component{
         maxTemp : obj.main.temp_max,
         minTemp: obj.main.temp_min,
         temp: obj.main.temp,
-        humidity : obj.main.humidity
+        humidity : obj.main.humidity,
+        condition : obj.weather[0].main,
+        icon : obj.weather[0].icon,
+        imageSrc : "http://openweathermap.org/img/wn/" + obj.weather[0].icon + "@2x.png"
       }, console.log(obj.main)))
-      .then(console.log(this.state.maxTemp))
-     // .then(() => console.log(this.state.maxTemp))
   }
-//temp, temp_max, temp_min, humidity
 
   componentDidMount(){
   }
@@ -68,15 +74,17 @@ class WeatherApp extends React.Component{
             </div>
             <div>
                 <form>
-                    <input type="text" placeholder="City" name="city" onChange={this.handleInputChanged}/>
-                    <input type="text" placeholder="State" name="state" onChange={this.handleInputChanged}/>
-                   <button onClick={this.getWeather}>Search</button>
-                   <p>{this.state.city} {this.state.state}</p>
-                   <p>The Max: {this.state.maxTemp}</p>
-                   <p>The Min: {this.state.minTemp}</p>
-                   <p>Temp: {this.state.maxTemp}</p>
-                   <p>Humidity: {this.state.maxTemp}</p>
+                    <TextField variant="filled" size="small" label="City" name="city" onChange={this.handleInputChanged}/>
+                    <TextField variant="filled" size="small" label="State" name="state" onChange={this.handleInputChanged}/>
+                    <Button variant="contained" size="small" startIcon={<CloudIcon/>} color="primary" onClick={this.getWeather}>Search</Button>
+                    <p>Here are the temperature for: {this.state.city}, {this.state.state}</p>
+                    <p>The Max: {Math.round((parseInt(this.state.maxTemp)-273)*1.8)+32}</p>
+                    <p>The Min: {Math.round((parseInt(this.state.minTemp)-273)*1.8)+32}</p>
+                    <p>Temp: {Math.round((parseInt(this.state.temp)-273)*1.8)+32}</p>
+                    <p>Humidity: {this.state.humidity + "%"}</p>
+                    <p>Condition: {this.state.condition}</p> 
                 </form>
+                <img src={this.state.imageSrc} alt="Some Icon"></img>
             </div>
         </div>
     )
