@@ -1,20 +1,21 @@
 import React from 'react'
 import Form from "./Form"
-import Button from '@material-ui/core/Button'
 import CloudIcon from '@material-ui/icons/Cloud'
 import TextField from '@material-ui/core/TextField'
+import darkMode from './darkMode2.svg'
+import cloudy from './weatherIcons/cloudy.svg'
+import clear from './weatherIcons/clear.svg'
+import drizzle from './weatherIcons/drizzle.svg'
+import rainy from './weatherIcons/rainy.svg'
+import snowy from './weatherIcons/snowy.svg'
+import thunder from './weatherIcons/thunder.svg'
+import { ButtonGroup } from '@material-ui/core'
+import { Switch, Paper , Button , Typography , FormControlLabel , FormGroup , makeStyles} from '@material-ui/core/'
+import { ThemeProvider, createMuiTheme} from '@material-ui/core/styles'
+
+
 
 const apiKey = "b2dc6d0fb2c25c99d7b90a281b8cedd3"
-// api.openweathermap.org/data/2.5/weather?q=Seoul&appid=b2dc6d0fb2c25c99d7b90a281b8cedd3
-// handleSubmit(){
-//   return (
-//     <form onSubmit={this.}>
-//       <input type="text" placeholder="City"/>
-//       <input type="text" placeholder="State"/>
-//       <button onClick={this.handleClick}>Search</button>
-//     </form>
-//   )
-// }
 
 class WeatherApp extends React.Component{
   constructor(){
@@ -23,15 +24,15 @@ class WeatherApp extends React.Component{
       error: null,
       isLoaded: false,
       items: [],
-      state: "State",
-      city: "City",
+      state: "CA",
+      city: "Los Angeles",
       maxTemp: "test",
       minTemp: "test",
       temp: "test",
       humidity: "test",
-      condition : "",
-      icon : "",
-      imageSrc : ""
+      condition : "clear",
+      metric: "",
+      darkModeToggle: true
     }
   }
 
@@ -41,6 +42,11 @@ class WeatherApp extends React.Component{
     })
   }
 
+  setDarkMode = () => {
+    this.setState({
+      darkModeToggle : !this.state.darkModeToggle
+    })
+  }
   
   getWeather = (event) => {
     let obj;
@@ -56,37 +62,87 @@ class WeatherApp extends React.Component{
         minTemp: obj.main.temp_min,
         temp: obj.main.temp,
         humidity : obj.main.humidity,
-        condition : obj.weather[0].main,
-        icon : obj.weather[0].icon,
-        imageSrc : "http://openweathermap.org/img/wn/" + obj.weather[0].icon + "@2x.png"
+        condition : obj.weather[0].main.toLowerCase(),
       }, console.log(obj.main)))
   }
 
   componentDidMount(){
+    let initial;
+    fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
+      .then((response) => response.json())
+      .then(data => initial = data)
+      .then(() => 
+      this.setState({
+        maxTemp : initial.main.temp_max,
+        minTemp: initial.main.temp_min,
+        temp: initial.main.temp,
+        humidity : initial.main.humidity,
+        condition : initial.weather[0].main.toLowerCase(),
+      },))
   }
 
+
   render(){
+
+    const theme = createMuiTheme({
+      palette: {
+        type: this.state.darkModeToggle ? "dark" : "light",
+      },
+    });
+
+
+    let weatherIcon;
+
+    if(this.state.condition === "clear"){
+    weatherIcon = clear
+  } else if (this.state.condition === "clouds"){
+    weatherIcon = cloudy
+  } else if (this.state.condition === "drizzle"){
+    weatherIcon = drizzle
+  } else if (this.state.condition === "rain"){
+    weatherIcon = rainy
+  } else if (this.state.condition === "snow"){
+    weatherIcon = snowy
+  } else if (this.state.condition === "thunderstorm"){
+    weatherIcon = thunder
+  } else {
+    weatherIcon = clear
+  }
+
     return(
-      <div>
-            <div>
-                <h1>Weather App</h1>
-                <h3>Daily source of temperature, weather conditions and etc</h3>
-            </div>
-            <div>
-                <form>
-                    <TextField variant="filled" size="small" label="City" name="city" onChange={this.handleInputChanged}/>
-                    <TextField variant="filled" size="small" label="State" name="state" onChange={this.handleInputChanged}/>
-                    <Button variant="contained" size="small" startIcon={<CloudIcon/>} color="primary" onClick={this.getWeather}>Search</Button>
-                    <p>Here are the temperature for: {this.state.city}, {this.state.state}</p>
-                    <p>The Max: {Math.round((parseInt(this.state.maxTemp)-273)*1.8)+32}</p>
-                    <p>The Min: {Math.round((parseInt(this.state.minTemp)-273)*1.8)+32}</p>
-                    <p>Temp: {Math.round((parseInt(this.state.temp)-273)*1.8)+32}</p>
-                    <p>Humidity: {this.state.humidity + "%"}</p>
-                    <p>Condition: {this.state.condition}</p> 
-                </form>
-                <img src={this.state.imageSrc} alt="Some Icon"></img>
-            </div>
-        </div>
+      <ThemeProvider theme={theme}>
+        <Paper style={{ height: "100vh" }}>
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'
+        }}>
+              <div style={{
+                display : 'flex' , justifyContent: 'space-between'
+              }}>
+                  <h1>Weather App</h1>
+                      <FormControlLabel control ={
+                        <Switch checked={this.state.darkModeToggle} onChange={this.setDarkMode} labelPlacement="bottom"/>}
+                        label="Dark Mode"
+                      />
+              </div>
+              <div>
+                  <form>
+                      <TextField variant="filled" size="small" label="City" name="city" onChange={this.handleInputChanged} fullWidth/>
+                      <TextField variant="filled" size="small" label="State" name="state" onChange={this.handleInputChanged} fullWidth/>
+                      <Button variant="contained" size="medium" startIcon={<CloudIcon/>} color="primary" onClick={this.getWeather} fullWidth>Search</Button>
+                      
+                      <p style={{fontSize: 30}}>{this.state.city}, {this.state.state}</p>
+                      <p>{Math.round((parseInt(this.state.maxTemp)-273)*1.8)+32} / {Math.round((parseInt(this.state.minTemp)-273)*1.8)+32}</p>
+                      <p>Humidity: {this.state.humidity + "%"}</p>
+                      <p>Condition: {this.state.condition}</p>
+                  </form>
+                  <div>
+                    <p style={{fontSize: 40}}>{Math.round((parseInt(this.state.temp)-273)*1.8)+32}</p>
+                    <img src={weatherIcon}></img>
+                  </div>
+              </div>
+          </div>
+          </Paper>
+        </ThemeProvider>
     )
   }
 }
