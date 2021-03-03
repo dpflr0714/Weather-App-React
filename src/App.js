@@ -14,25 +14,21 @@ import { Switch, Paper , Button , Typography , FormControlLabel , FormGroup , ma
 import { ThemeProvider, createMuiTheme} from '@material-ui/core/styles'
 
 
-
 const apiKey = "b2dc6d0fb2c25c99d7b90a281b8cedd3"
 
 class WeatherApp extends React.Component{
   constructor(){
     super()
     this.state = {
-      error: null,
-      isLoaded: false,
-      items: [],
       state: "CA",
       city: "Los Angeles",
-      maxTemp: "test",
-      minTemp: "test",
-      temp: "test",
-      humidity: "test",
-      condition : "clear",
-      metric: "",
-      darkModeToggle: true
+      maxTemp: "",
+      minTemp: "",
+      temp: "",
+      humidity: "",
+      condition : "",
+      darkModeToggle: true,
+      message: ""
     }
   }
 
@@ -52,9 +48,14 @@ class WeatherApp extends React.Component{
     let obj;
     event.preventDefault(); //this stops from the page from reloading everytime you submit the search
     
-    
     let response = fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
-      .then(response => response.json())
+      .then(response => {
+        if(response.status >= 200 && response.status <= 299){
+          return response.json()
+        } else {
+          throw Error(response.statusText) 
+        }
+      })
       .then(data => obj = data)
       .then(() => 
       this.setState({
@@ -63,7 +64,7 @@ class WeatherApp extends React.Component{
         temp: obj.main.temp,
         humidity : obj.main.humidity,
         condition : obj.weather[0].main.toLowerCase(),
-      }, console.log(obj.main)))
+      })).catch((error) => alert("Are you sure the place exists on Earth?"))
   }
 
   componentDidMount(){
@@ -115,32 +116,39 @@ class WeatherApp extends React.Component{
         <div style={{
           position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'
         }}>
-              <div style={{
-                display : 'flex' , justifyContent: 'space-between'
-              }}>
-                  <h1>Weather App</h1>
-                      <FormControlLabel control ={
-                        <Switch checked={this.state.darkModeToggle} onChange={this.setDarkMode} labelPlacement="bottom"/>}
-                        label="Dark Mode"
-                      />
-              </div>
-              <div>
+                <div style={{
+                  display : 'flex' , justifyContent: 'space-between'
+                }}>
+                    <h1>Weather App</h1>
+                        <FormControlLabel control ={
+                          <Switch checked={this.state.darkModeToggle} onChange={this.setDarkMode}/>}
+                          label="Dark Mode"
+                        />
+                </div>
+                <div>
                   <form>
                       <TextField variant="filled" size="small" label="City" name="city" onChange={this.handleInputChanged} fullWidth/>
                       <TextField variant="filled" size="small" label="State" name="state" onChange={this.handleInputChanged} fullWidth/>
                       <Button variant="contained" size="medium" startIcon={<CloudIcon/>} color="primary" onClick={this.getWeather} fullWidth>Search</Button>
-                      
+                  </form>
+                  <div style={{
+                    display : 'flex' , justifyContent : 'space-between' 
+                  }}>    
+                    <div>        
                       <p style={{fontSize: 30}}>{this.state.city}, {this.state.state}</p>
                       <p>{Math.round((parseInt(this.state.maxTemp)-273)*1.8)+32} / {Math.round((parseInt(this.state.minTemp)-273)*1.8)+32}</p>
                       <p>Humidity: {this.state.humidity + "%"}</p>
                       <p>Condition: {this.state.condition}</p>
-                  </form>
-                  <div>
-                    <p style={{fontSize: 40}}>{Math.round((parseInt(this.state.temp)-273)*1.8)+32}</p>
-                    <img src={weatherIcon}></img>
+                    </div>
+                    <div style={{
+                      display : 'flex' , justifyContent : 'space-evenly' , alignContent : 'flex-start' , flexGrow : '1' , alignItems : 'center'
+                    }}>    
+                      <p style={{fontSize: 60}}>{Math.round((parseInt(this.state.temp)-273)*1.8)+32}</p>
+                      <img src={weatherIcon} style={{height: '100px', width: 'auto'}}></img>
+                    </div>
                   </div>
-              </div>
-          </div>
+                </div>
+            </div>
           </Paper>
         </ThemeProvider>
     )
