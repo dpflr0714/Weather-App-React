@@ -9,9 +9,9 @@ import drizzle from './weatherIcons/drizzle.svg'
 import rainy from './weatherIcons/rainy.svg'
 import snowy from './weatherIcons/snowy.svg'
 import thunder from './weatherIcons/thunder.svg'
-import { ButtonGroup } from '@material-ui/core'
-import { Switch, Paper , Button , Typography , FormControlLabel , FormGroup , makeStyles} from '@material-ui/core/'
+import { Switch, Paper , Button , Typography , FormControlLabel , FormGroup , makeStyles, AppBar , Toolbar , IconButton , Box, Icon} from '@material-ui/core/'
 import { ThemeProvider, createMuiTheme} from '@material-ui/core/styles'
+import GitHubIcon from '@material-ui/icons/GitHub'
 
 
 const apiKey = "b2dc6d0fb2c25c99d7b90a281b8cedd3"
@@ -32,6 +32,7 @@ class WeatherApp extends React.Component{
     }
   }
 
+  
   handleInputChanged = (event) => {
     this.setState({
       [event.target.name] : event.target.value
@@ -113,9 +114,19 @@ class WeatherApp extends React.Component{
     return(
       <ThemeProvider theme={theme}>
         <Paper style={{ height: "100vh" }}>
-        <div style={{
-          position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'
-        }}>
+          <Box>
+            <AppBar>
+              <Toolbar style={{flexGrow : "1" , justifyContent: "space-between" }}>
+                <IconButton>
+                  <GitHubIcon/>
+                </IconButton>
+                <Button>About Me</Button>
+              </Toolbar>
+            </AppBar>
+          </Box>
+            <div style={{
+              position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'
+            }}>
                 <div style={{
                   display : 'flex' , justifyContent: 'space-between'
                 }}>
