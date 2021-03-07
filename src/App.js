@@ -68,7 +68,7 @@ class WeatherApp extends React.Component{
 
   componentDidMount(){
     let initial;
-    fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
       .then((response) => response.json())
       .then(data => initial = data)
       .then(() => 
