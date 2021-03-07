@@ -47,7 +47,7 @@ class WeatherApp extends React.Component{
     let obj;
     event.preventDefault(); //this stops from the page from reloading everytime you submit the search
     
-    let response = fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
+    let response = fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.state.city}&appid=${apiKey}`)
       .then(response => {
         if(response.status >= 200 && response.status <= 299){
           return response.json()
